@@ -136,6 +136,12 @@ func GetCloudRunV2ServiceApiObject(d tpgresource.TerraformResourceData, config *
 	} else if v, ok := d.GetOkExists("build_config"); !tpgresource.IsEmptyValue(reflect.ValueOf(buildConfigProp)) && (ok || !reflect.DeepEqual(v, buildConfigProp)) {
 		obj["buildConfig"] = buildConfigProp
 	}
+	iapEnabledProp, err := expandCloudRunV2ServiceIapEnabled(d.Get("iap_enabled"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("iap_enabled"); !tpgresource.IsEmptyValue(reflect.ValueOf(iapEnabledProp)) && (ok || !reflect.DeepEqual(v, iapEnabledProp)) {
+		obj["iapEnabled"] = iapEnabledProp
+	}
 	labelsProp, err := expandCloudRunV2ServiceEffectiveLabels(d.Get("effective_labels"), d, config)
 	if err != nil {
 		return nil, err
@@ -360,6 +366,13 @@ func expandCloudRunV2ServiceTemplate(v interface{}, d tpgresource.TerraformResou
 		return nil, err
 	} else if val := reflect.ValueOf(transformedNodeSelector); val.IsValid() && !tpgresource.IsEmptyValue(val) {
 		transformed["nodeSelector"] = transformedNodeSelector
+	}
+
+	transformedGpuZonalRedundancyDisabled, err := expandCloudRunV2ServiceTemplateGpuZonalRedundancyDisabled(original["gpu_zonal_redundancy_disabled"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedGpuZonalRedundancyDisabled); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["gpuZonalRedundancyDisabled"] = transformedGpuZonalRedundancyDisabled
 	}
 
 	return transformed, nil
@@ -1730,6 +1743,10 @@ func expandCloudRunV2ServiceTemplateNodeSelectorAccelerator(v interface{}, d tpg
 	return v, nil
 }
 
+func expandCloudRunV2ServiceTemplateGpuZonalRedundancyDisabled(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
 func expandCloudRunV2ServiceTraffic(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	l := v.([]interface{})
 	req := make([]interface{}, 0, len(l))
@@ -1908,6 +1925,10 @@ func expandCloudRunV2ServiceBuildConfigEnvironmentVariables(v interface{}, d tpg
 }
 
 func expandCloudRunV2ServiceBuildConfigServiceAccount(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandCloudRunV2ServiceIapEnabled(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 

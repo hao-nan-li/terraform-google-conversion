@@ -317,6 +317,12 @@ func GetComputeBackendServiceApiObject(d tpgresource.TerraformResourceData, conf
 	} else if v, ok := d.GetOkExists("locality_lb_policies"); !tpgresource.IsEmptyValue(reflect.ValueOf(localityLbPoliciesProp)) && (ok || !reflect.DeepEqual(v, localityLbPoliciesProp)) {
 		obj["localityLbPolicies"] = localityLbPoliciesProp
 	}
+	customMetricsProp, err := expandComputeBackendServiceCustomMetrics(d.Get("custom_metrics"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("custom_metrics"); !tpgresource.IsEmptyValue(reflect.ValueOf(customMetricsProp)) && (ok || !reflect.DeepEqual(v, customMetricsProp)) {
+		obj["customMetrics"] = customMetricsProp
+	}
 	nameProp, err := expandComputeBackendServiceName(d.Get("name"), d, config)
 	if err != nil {
 		return nil, err
@@ -388,6 +394,18 @@ func GetComputeBackendServiceApiObject(d tpgresource.TerraformResourceData, conf
 		return nil, err
 	} else if v, ok := d.GetOkExists("service_lb_policy"); !tpgresource.IsEmptyValue(reflect.ValueOf(serviceLbPolicyProp)) && (ok || !reflect.DeepEqual(v, serviceLbPolicyProp)) {
 		obj["serviceLbPolicy"] = serviceLbPolicyProp
+	}
+	tlsSettingsProp, err := expandComputeBackendServiceTlsSettings(d.Get("tls_settings"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("tls_settings"); !tpgresource.IsEmptyValue(reflect.ValueOf(tlsSettingsProp)) && (ok || !reflect.DeepEqual(v, tlsSettingsProp)) {
+		obj["tlsSettings"] = tlsSettingsProp
+	}
+	maxStreamDurationProp, err := expandComputeBackendServiceMaxStreamDuration(d.Get("max_stream_duration"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("max_stream_duration"); !tpgresource.IsEmptyValue(reflect.ValueOf(maxStreamDurationProp)) && (ok || !reflect.DeepEqual(v, maxStreamDurationProp)) {
+		obj["maxStreamDuration"] = maxStreamDurationProp
 	}
 
 	return resourceComputeBackendServiceEncoder(d, config, obj)
@@ -480,6 +498,13 @@ func expandComputeBackendServiceBackend(v interface{}, d tpgresource.TerraformRe
 			transformed["capacityScaler"] = transformedCapacityScaler
 		}
 
+		transformedPreference, err := expandComputeBackendServiceBackendPreference(original["preference"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedPreference); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["preference"] = transformedPreference
+		}
+
 		transformedDescription, err := expandComputeBackendServiceBackendDescription(original["description"], d, config)
 		if err != nil {
 			return nil, err
@@ -543,6 +568,13 @@ func expandComputeBackendServiceBackend(v interface{}, d tpgresource.TerraformRe
 			transformed["maxUtilization"] = transformedMaxUtilization
 		}
 
+		transformedCustomMetrics, err := expandComputeBackendServiceBackendCustomMetrics(original["custom_metrics"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedCustomMetrics); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["customMetrics"] = transformedCustomMetrics
+		}
+
 		req = append(req, transformed)
 	}
 	return req, nil
@@ -553,6 +585,10 @@ func expandComputeBackendServiceBackendBalancingMode(v interface{}, d tpgresourc
 }
 
 func expandComputeBackendServiceBackendCapacityScaler(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceBackendPreference(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -589,6 +625,54 @@ func expandComputeBackendServiceBackendMaxRatePerEndpoint(v interface{}, d tpgre
 }
 
 func expandComputeBackendServiceBackendMaxUtilization(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceBackendCustomMetrics(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	l := v.([]interface{})
+	req := make([]interface{}, 0, len(l))
+	for _, raw := range l {
+		if raw == nil {
+			continue
+		}
+		original := raw.(map[string]interface{})
+		transformed := make(map[string]interface{})
+
+		transformedName, err := expandComputeBackendServiceBackendCustomMetricsName(original["name"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedName); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["name"] = transformedName
+		}
+
+		transformedDryRun, err := expandComputeBackendServiceBackendCustomMetricsDryRun(original["dry_run"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedDryRun); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["dryRun"] = transformedDryRun
+		}
+
+		transformedMaxUtilization, err := expandComputeBackendServiceBackendCustomMetricsMaxUtilization(original["max_utilization"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedMaxUtilization); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["maxUtilization"] = transformedMaxUtilization
+		}
+
+		req = append(req, transformed)
+	}
+	return req, nil
+}
+
+func expandComputeBackendServiceBackendCustomMetricsName(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceBackendCustomMetricsDryRun(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceBackendCustomMetricsMaxUtilization(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -829,6 +913,13 @@ func expandComputeBackendServiceCdnPolicy(v interface{}, d tpgresource.Terraform
 	original := raw.(map[string]interface{})
 	transformed := make(map[string]interface{})
 
+	transformedRequestCoalescing, err := expandComputeBackendServiceCdnPolicyRequestCoalescing(original["request_coalescing"], d, config)
+	if err != nil {
+		return nil, err
+	} else {
+		transformed["requestCoalescing"] = transformedRequestCoalescing
+	}
+
 	transformedCacheKeyPolicy, err := expandComputeBackendServiceCdnPolicyCacheKeyPolicy(original["cache_key_policy"], d, config)
 	if err != nil {
 		return nil, err
@@ -900,6 +991,10 @@ func expandComputeBackendServiceCdnPolicy(v interface{}, d tpgresource.Terraform
 	}
 
 	return transformed, nil
+}
+
+func expandComputeBackendServiceCdnPolicyRequestCoalescing(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
 }
 
 func expandComputeBackendServiceCdnPolicyCacheKeyPolicy(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
@@ -1278,6 +1373,43 @@ func expandComputeBackendServiceLocalityLbPoliciesCustomPolicyName(v interface{}
 }
 
 func expandComputeBackendServiceLocalityLbPoliciesCustomPolicyData(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceCustomMetrics(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	l := v.([]interface{})
+	req := make([]interface{}, 0, len(l))
+	for _, raw := range l {
+		if raw == nil {
+			continue
+		}
+		original := raw.(map[string]interface{})
+		transformed := make(map[string]interface{})
+
+		transformedName, err := expandComputeBackendServiceCustomMetricsName(original["name"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedName); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["name"] = transformedName
+		}
+
+		transformedDryRun, err := expandComputeBackendServiceCustomMetricsDryRun(original["dry_run"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedDryRun); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["dryRun"] = transformedDryRun
+		}
+
+		req = append(req, transformed)
+	}
+	return req, nil
+}
+
+func expandComputeBackendServiceCustomMetricsName(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceCustomMetricsDryRun(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -1697,6 +1829,20 @@ func expandComputeBackendServiceLogConfig(v interface{}, d tpgresource.Terraform
 		transformed["sampleRate"] = transformedSampleRate
 	}
 
+	transformedOptionalMode, err := expandComputeBackendServiceLogConfigOptionalMode(original["optional_mode"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedOptionalMode); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["optionalMode"] = transformedOptionalMode
+	}
+
+	transformedOptionalFields, err := expandComputeBackendServiceLogConfigOptionalFields(original["optional_fields"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedOptionalFields); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["optionalFields"] = transformedOptionalFields
+	}
+
 	return transformed, nil
 }
 
@@ -1708,6 +1854,126 @@ func expandComputeBackendServiceLogConfigSampleRate(v interface{}, d tpgresource
 	return v, nil
 }
 
+func expandComputeBackendServiceLogConfigOptionalMode(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceLogConfigOptionalFields(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
 func expandComputeBackendServiceServiceLbPolicy(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceTlsSettings(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedSni, err := expandComputeBackendServiceTlsSettingsSni(original["sni"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedSni); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["sni"] = transformedSni
+	}
+
+	transformedSubjectAltNames, err := expandComputeBackendServiceTlsSettingsSubjectAltNames(original["subject_alt_names"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedSubjectAltNames); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["subjectAltNames"] = transformedSubjectAltNames
+	}
+
+	transformedAuthenticationConfig, err := expandComputeBackendServiceTlsSettingsAuthenticationConfig(original["authentication_config"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedAuthenticationConfig); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["authenticationConfig"] = transformedAuthenticationConfig
+	}
+
+	return transformed, nil
+}
+
+func expandComputeBackendServiceTlsSettingsSni(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceTlsSettingsSubjectAltNames(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	l := v.([]interface{})
+	req := make([]interface{}, 0, len(l))
+	for _, raw := range l {
+		if raw == nil {
+			continue
+		}
+		original := raw.(map[string]interface{})
+		transformed := make(map[string]interface{})
+
+		transformedDnsName, err := expandComputeBackendServiceTlsSettingsSubjectAltNamesDnsName(original["dns_name"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedDnsName); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["dnsName"] = transformedDnsName
+		}
+
+		transformedUniformResourceIdentifier, err := expandComputeBackendServiceTlsSettingsSubjectAltNamesUniformResourceIdentifier(original["uniform_resource_identifier"], d, config)
+		if err != nil {
+			return nil, err
+		} else if val := reflect.ValueOf(transformedUniformResourceIdentifier); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+			transformed["uniformResourceIdentifier"] = transformedUniformResourceIdentifier
+		}
+
+		req = append(req, transformed)
+	}
+	return req, nil
+}
+
+func expandComputeBackendServiceTlsSettingsSubjectAltNamesDnsName(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceTlsSettingsSubjectAltNamesUniformResourceIdentifier(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceTlsSettingsAuthenticationConfig(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceMaxStreamDuration(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	l := v.([]interface{})
+	if len(l) == 0 || l[0] == nil {
+		return nil, nil
+	}
+	raw := l[0]
+	original := raw.(map[string]interface{})
+	transformed := make(map[string]interface{})
+
+	transformedSeconds, err := expandComputeBackendServiceMaxStreamDurationSeconds(original["seconds"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedSeconds); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["seconds"] = transformedSeconds
+	}
+
+	transformedNanos, err := expandComputeBackendServiceMaxStreamDurationNanos(original["nanos"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedNanos); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["nanos"] = transformedNanos
+	}
+
+	return transformed, nil
+}
+
+func expandComputeBackendServiceMaxStreamDurationSeconds(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeBackendServiceMaxStreamDurationNanos(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }

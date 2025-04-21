@@ -184,6 +184,13 @@ func expandComputeSnapshotSnapshotEncryptionKey(v interface{}, d tpgresource.Ter
 		transformed["rawKey"] = transformedRawKey
 	}
 
+	transformedRsaEncryptedKey, err := expandComputeSnapshotSnapshotEncryptionKeyRsaEncryptedKey(original["rsa_encrypted_key"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedRsaEncryptedKey); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["rsaEncryptedKey"] = transformedRsaEncryptedKey
+	}
+
 	transformedSha256, err := expandComputeSnapshotSnapshotEncryptionKeySha256(original["sha256"], d, config)
 	if err != nil {
 		return nil, err
@@ -209,6 +216,10 @@ func expandComputeSnapshotSnapshotEncryptionKey(v interface{}, d tpgresource.Ter
 }
 
 func expandComputeSnapshotSnapshotEncryptionKeyRawKey(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeSnapshotSnapshotEncryptionKeyRsaEncryptedKey(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -240,6 +251,20 @@ func expandComputeSnapshotSourceDiskEncryptionKey(v interface{}, d tpgresource.T
 		transformed["rawKey"] = transformedRawKey
 	}
 
+	transformedRsaEncryptedKey, err := expandComputeSnapshotSourceDiskEncryptionKeyRsaEncryptedKey(original["rsa_encrypted_key"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedRsaEncryptedKey); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["rsaEncryptedKey"] = transformedRsaEncryptedKey
+	}
+
+	transformedKmsKeySelfLink, err := expandComputeSnapshotSourceDiskEncryptionKeyKmsKeySelfLink(original["kms_key_self_link"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedKmsKeySelfLink); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["kmsKeyName"] = transformedKmsKeySelfLink
+	}
+
 	transformedKmsKeyServiceAccount, err := expandComputeSnapshotSourceDiskEncryptionKeyKmsKeyServiceAccount(original["kms_key_service_account"], d, config)
 	if err != nil {
 		return nil, err
@@ -251,6 +276,14 @@ func expandComputeSnapshotSourceDiskEncryptionKey(v interface{}, d tpgresource.T
 }
 
 func expandComputeSnapshotSourceDiskEncryptionKeyRawKey(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeSnapshotSourceDiskEncryptionKeyRsaEncryptedKey(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeSnapshotSourceDiskEncryptionKeyKmsKeySelfLink(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 

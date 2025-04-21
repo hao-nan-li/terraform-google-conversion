@@ -82,6 +82,18 @@ func sendSecondaryIpRangeIfEmptyDiff(_ context.Context, diff *schema.ResourceDif
 	return nil
 }
 
+// DiffSuppressFunc for `log_config`.
+func subnetworkLogConfigDiffSuppress(k, old, new string, d *schema.ResourceData) bool {
+	// If enable_flow_logs is enabled and log_config is not set, ignore the diff
+	if enable_flow_logs := d.Get("enable_flow_logs"); enable_flow_logs.(bool) {
+		logConfig := d.GetRawConfig().GetAttr("log_config")
+		logConfigIsEmpty := logConfig.IsNull() || logConfig.LengthInt() == 0
+		return logConfigIsEmpty
+	}
+
+	return false
+}
+
 const ComputeSubnetworkAssetType string = "compute.googleapis.com/Subnetwork"
 
 func ResourceConverterComputeSubnetwork() cai.ResourceConverter {
@@ -204,11 +216,23 @@ func GetComputeSubnetworkApiObject(d tpgresource.TerraformResourceData, config *
 	} else if v, ok := d.GetOkExists("external_ipv6_prefix"); !tpgresource.IsEmptyValue(reflect.ValueOf(externalIpv6PrefixProp)) && (ok || !reflect.DeepEqual(v, externalIpv6PrefixProp)) {
 		obj["externalIpv6Prefix"] = externalIpv6PrefixProp
 	}
+	ipCollectionProp, err := expandComputeSubnetworkIpCollection(d.Get("ip_collection"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("ip_collection"); !tpgresource.IsEmptyValue(reflect.ValueOf(ipCollectionProp)) && (ok || !reflect.DeepEqual(v, ipCollectionProp)) {
+		obj["ipCollection"] = ipCollectionProp
+	}
 	allowSubnetCidrRoutesOverlapProp, err := expandComputeSubnetworkAllowSubnetCidrRoutesOverlap(d.Get("allow_subnet_cidr_routes_overlap"), d, config)
 	if err != nil {
 		return nil, err
 	} else if v, ok := d.GetOkExists("allow_subnet_cidr_routes_overlap"); ok || !reflect.DeepEqual(v, allowSubnetCidrRoutesOverlapProp) {
 		obj["allowSubnetCidrRoutesOverlap"] = allowSubnetCidrRoutesOverlapProp
+	}
+	enableFlowLogsProp, err := expandComputeSubnetworkEnableFlowLogs(d.Get("enable_flow_logs"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("enable_flow_logs"); !tpgresource.IsEmptyValue(reflect.ValueOf(enableFlowLogsProp)) && (ok || !reflect.DeepEqual(v, enableFlowLogsProp)) {
+		obj["enableFlowLogs"] = enableFlowLogsProp
 	}
 
 	return obj, nil
@@ -320,6 +344,7 @@ func expandComputeSubnetworkLogConfig(v interface{}, d tpgresource.TerraformReso
 			// Subnetworks for regional L7 ILB/XLB or cross-regional L7 ILB do not accept any values for logConfig
 			return nil, nil
 		}
+
 		// send enable = false to ensure logging is disabled if there is no config
 		transformed["enable"] = false
 		return transformed, nil
@@ -353,6 +378,14 @@ func expandComputeSubnetworkExternalIpv6Prefix(v interface{}, d tpgresource.Terr
 	return v, nil
 }
 
+func expandComputeSubnetworkIpCollection(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
 func expandComputeSubnetworkAllowSubnetCidrRoutesOverlap(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandComputeSubnetworkEnableFlowLogs(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }

@@ -142,6 +142,12 @@ func GetDataprocMetastoreServiceApiObject(d tpgresource.TerraformResourceData, c
 	} else if v, ok := d.GetOkExists("telemetry_config"); !tpgresource.IsEmptyValue(reflect.ValueOf(telemetryConfigProp)) && (ok || !reflect.DeepEqual(v, telemetryConfigProp)) {
 		obj["telemetryConfig"] = telemetryConfigProp
 	}
+	tagsProp, err := expandDataprocMetastoreServiceTags(d.Get("tags"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("tags"); !tpgresource.IsEmptyValue(reflect.ValueOf(tagsProp)) && (ok || !reflect.DeepEqual(v, tagsProp)) {
+		obj["tags"] = tagsProp
+	}
 	labelsProp, err := expandDataprocMetastoreServiceEffectiveLabels(d.Get("effective_labels"), d, config)
 	if err != nil {
 		return nil, err
@@ -221,6 +227,13 @@ func expandDataprocMetastoreServiceScalingConfigAutoscalingConfig(v interface{},
 		transformed["autoscalingEnabled"] = transformedAutoscalingEnabled
 	}
 
+	transformedAutoscalingFactor, err := expandDataprocMetastoreServiceScalingConfigAutoscalingConfigAutoscalingFactor(original["autoscaling_factor"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedAutoscalingFactor); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["autoscalingFactor"] = transformedAutoscalingFactor
+	}
+
 	transformedLimitConfig, err := expandDataprocMetastoreServiceScalingConfigAutoscalingConfigLimitConfig(original["limit_config"], d, config)
 	if err != nil {
 		return nil, err
@@ -232,6 +245,10 @@ func expandDataprocMetastoreServiceScalingConfigAutoscalingConfig(v interface{},
 }
 
 func expandDataprocMetastoreServiceScalingConfigAutoscalingConfigAutoscalingEnabled(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandDataprocMetastoreServiceScalingConfigAutoscalingConfigAutoscalingFactor(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -701,6 +718,17 @@ func expandDataprocMetastoreServiceTelemetryConfig(v interface{}, d tpgresource.
 
 func expandDataprocMetastoreServiceTelemetryConfigLogFormat(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
+}
+
+func expandDataprocMetastoreServiceTags(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (map[string]string, error) {
+	if v == nil {
+		return map[string]string{}, nil
+	}
+	m := make(map[string]string)
+	for k, val := range v.(map[string]interface{}) {
+		m[k] = val.(string)
+	}
+	return m, nil
 }
 
 func expandDataprocMetastoreServiceEffectiveLabels(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (map[string]string, error) {

@@ -102,6 +102,12 @@ func GetMonitoringUptimeCheckConfigApiObject(d tpgresource.TerraformResourceData
 	} else if v, ok := d.GetOkExists("selected_regions"); !tpgresource.IsEmptyValue(reflect.ValueOf(selectedRegionsProp)) && (ok || !reflect.DeepEqual(v, selectedRegionsProp)) {
 		obj["selectedRegions"] = selectedRegionsProp
 	}
+	logCheckFailuresProp, err := expandMonitoringUptimeCheckConfigLogCheckFailures(d.Get("log_check_failures"), d, config)
+	if err != nil {
+		return nil, err
+	} else if v, ok := d.GetOkExists("log_check_failures"); !tpgresource.IsEmptyValue(reflect.ValueOf(logCheckFailuresProp)) && (ok || !reflect.DeepEqual(v, logCheckFailuresProp)) {
+		obj["logCheckFailures"] = logCheckFailuresProp
+	}
 	checkerTypeProp, err := expandMonitoringUptimeCheckConfigCheckerType(d.Get("checker_type"), d, config)
 	if err != nil {
 		return nil, err
@@ -143,6 +149,24 @@ func GetMonitoringUptimeCheckConfigApiObject(d tpgresource.TerraformResourceData
 		return nil, err
 	} else if v, ok := d.GetOkExists("synthetic_monitor"); !tpgresource.IsEmptyValue(reflect.ValueOf(syntheticMonitorProp)) && (ok || !reflect.DeepEqual(v, syntheticMonitorProp)) {
 		obj["syntheticMonitor"] = syntheticMonitorProp
+	}
+
+	return resourceMonitoringUptimeCheckConfigEncoder(d, config, obj)
+}
+
+func resourceMonitoringUptimeCheckConfigEncoder(d tpgresource.TerraformResourceData, meta interface{}, obj map[string]interface{}) (map[string]interface{}, error) {
+	// remove passwordWoVersion from the request body
+	if v, ok := obj["httpCheck"]; ok {
+		httpCheck := v.(map[string]interface{})
+		if authInfo, ok := httpCheck["authInfo"].(map[string]interface{}); ok {
+			delete(authInfo, "passwordWoVersion")
+			if len(authInfo) > 0 {
+				httpCheck["authInfo"] = authInfo
+			} else {
+				delete(httpCheck, "authInfo")
+			}
+			obj["httpCheck"] = httpCheck
+		}
 	}
 
 	return obj, nil
@@ -239,6 +263,10 @@ func expandMonitoringUptimeCheckConfigContentMatchersJsonPathMatcherJsonMatcher(
 }
 
 func expandMonitoringUptimeCheckConfigSelectedRegions(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandMonitoringUptimeCheckConfigLogCheckFailures(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
@@ -395,6 +423,20 @@ func expandMonitoringUptimeCheckConfigHttpCheckAuthInfo(v interface{}, d tpgreso
 		transformed["password"] = transformedPassword
 	}
 
+	transformedPasswordWo, err := expandMonitoringUptimeCheckConfigHttpCheckAuthInfoPasswordWo(original["password_wo"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPasswordWo); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["passwordWo"] = transformedPasswordWo
+	}
+
+	transformedPasswordWoVersion, err := expandMonitoringUptimeCheckConfigHttpCheckAuthInfoPasswordWoVersion(original["password_wo_version"], d, config)
+	if err != nil {
+		return nil, err
+	} else if val := reflect.ValueOf(transformedPasswordWoVersion); val.IsValid() && !tpgresource.IsEmptyValue(val) {
+		transformed["passwordWoVersion"] = transformedPasswordWoVersion
+	}
+
 	transformedUsername, err := expandMonitoringUptimeCheckConfigHttpCheckAuthInfoUsername(original["username"], d, config)
 	if err != nil {
 		return nil, err
@@ -406,6 +448,14 @@ func expandMonitoringUptimeCheckConfigHttpCheckAuthInfo(v interface{}, d tpgreso
 }
 
 func expandMonitoringUptimeCheckConfigHttpCheckAuthInfoPassword(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandMonitoringUptimeCheckConfigHttpCheckAuthInfoPasswordWo(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
+	return v, nil
+}
+
+func expandMonitoringUptimeCheckConfigHttpCheckAuthInfoPasswordWoVersion(v interface{}, d tpgresource.TerraformResourceData, config *transport_tpg.Config) (interface{}, error) {
 	return v, nil
 }
 
